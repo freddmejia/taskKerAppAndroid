@@ -23,6 +23,7 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Delete
+import androidx.compose.material3.Button
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.Checkbox
@@ -103,45 +104,12 @@ fun TaskHomeScreen(
             onUndo = { task ->
                 viewModel.restoreTask(task.copy(status = 1))
             },
-            snackbarHostState = snackbarHostState
+            snackbarHostState = snackbarHostState,
+            onLoadMore = {
+                viewModel.loadMoreTasks(status = 1)
+            }
         )
     }
-}
-
-fun generateDummyTasks(): List<TaskEntity> {
-    val now = System.currentTimeMillis()
-    val oneDayMillis = 24 * 60 * 60 * 1000
-
-    return listOf(
-        TaskEntity(id = 1, title = "Comprar leche", description = "En el supermercado", isDone = false, timestamp = now, priority = 1),
-        TaskEntity(id = 2, title = "Llamar al doctor", isDone = true, timestamp = now, priority = 2),
-        TaskEntity(id = 3, title = "Terminar reporte", description = "Enviar antes de las 18h", isDone = false, timestamp = now - oneDayMillis, priority = 3),
-        TaskEntity(id = 4, title = "Ir al gimnasio", isDone = false, timestamp = now - oneDayMillis * 2, priority = 2),
-        TaskEntity(id = 5, title = "Leer libro", isDone = true, timestamp = now - oneDayMillis * 2, priority = 1),
-        TaskEntity(id = 6, title = "Lavar ropa", isDone = false, timestamp = now + oneDayMillis, priority = 1),
-        TaskEntity(id = 7, title = "Lavar ropa", isDone = false, timestamp = now + oneDayMillis, priority = 1),
-        TaskEntity(id = 8, title = "Lavar ropa", isDone = false, timestamp = now + oneDayMillis, priority = 1),
-        TaskEntity(id = 9, title = "Lavar ropa", isDone = false, timestamp = now + oneDayMillis, priority = 1),
-        TaskEntity(id = 10, title = "Lavar ropa", isDone = false, timestamp = now + oneDayMillis, priority = 1),
-        TaskEntity(id = 11, title = "Lavar ropa", isDone = false, timestamp = now + oneDayMillis, priority = 1),
-        TaskEntity(id = 12, title = "Lavar ropa", isDone = false, timestamp = now + oneDayMillis, priority = 1)
-
-    )
-}
-
-
-@RequiresApi(Build.VERSION_CODES.O)
-@Preview
-@Composable
-fun ShowTaskFormScreen(){
-    val snackbarHostState = remember { SnackbarHostState() }
-    TaskScreen(
-        tasks =  generateDummyTasks(),
-        onTaskCheckedChange = { _, _ -> },
-        onTaskDismissed = {},
-        onUndo = {},
-        snackbarHostState = snackbarHostState
-    )
 }
 
 @OptIn(ExperimentalMaterial3Api::class, ExperimentalFoundationApi::class)
@@ -152,6 +120,7 @@ fun TaskScreen(
     onTaskCheckedChange: (TaskEntity, Boolean) -> Unit,
     onTaskDismissed: (TaskEntity) -> Unit,
     onUndo: (TaskEntity) -> Unit,
+    onLoadMore: ()-> Unit,
     snackbarHostState: SnackbarHostState
 ) {
     val scope = rememberCoroutineScope()
@@ -230,6 +199,13 @@ fun TaskScreen(
                                 enableDismissFromStartToEnd = false
                             )
                         }
+                    }
+                }
+                item {
+                    Button(
+                        onClick = { onLoadMore() },
+                    ) {
+                        Text("Cargar más")
                     }
                 }
             }
